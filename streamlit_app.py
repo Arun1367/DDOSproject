@@ -18,12 +18,14 @@ try:
 except Exception as e:
     st.error(f"❌ Error Loading Scaler: {e}")
 
-# Define actual feature names (Replace with actual column names from your dataset)
+# Define the 17 actual feature names (Ensure these match the training data)
 feature_names = [
     "Destination Port", "Flow Duration", "Total Fwd Packets", "Total Backward Packets", 
-    "Total Length of Fwd Packets", "Total Length of Bwd Packets", "Flow IAT Mean", 
-    "Flow IAT Std", "Flow IAT Max", "Flow IAT Min"
-]  # ⚠️ Adjust this list to match your dataset
+    "Total Length of Fwd Packets", "Total Length of Bwd Packets", "Fwd Packet Length Max", 
+    "Fwd Packet Length Min", "Fwd Packet Length Mean", "Fwd Packet Length Std",
+    "Bwd Packet Length Max", "Bwd Packet Length Min", "Bwd Packet Length Mean", 
+    "Bwd Packet Length Std", "Flow Bytes/s", "Flow Packets/s", "Flow IAT Mean"
+]  # ⚠️ Excluding "Label" since it's the target variable
 
 # Streamlit UI
 st.title("🚀 DDoS Attack Detection with CNN")
@@ -41,6 +43,8 @@ X_new = np.array([list(inputs.values())]).reshape(1, -1)
 def predict_ddos(features):
     try:
         features = np.array(features).reshape(1, -1)
+        if features.shape[1] != 17:
+            return f"❌ Error: Expected 17 features, but received {features.shape[1]}."
         features = scaler.transform(features)  # Scale input
         prediction = model.predict(features)[0][0]
         return "🚨 DDoS Attack Detected!" if prediction > 0.5 else "✅ Benign Traffic"
