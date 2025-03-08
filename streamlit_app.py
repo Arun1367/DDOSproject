@@ -24,7 +24,7 @@ if df is not None:
         df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
         X = df.drop('Label', axis=1)
         y = df['Label']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=39)
 
         # CNN Model Training
         def train_cnn(X_train, y_train, X_test, y_test):
