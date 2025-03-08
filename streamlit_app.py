@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
 # Example Data (Replace with your actual data loading from a file)
-def load_data(.devcontainer/ddos_attack.xlsx):
+def load_data(devcontainer/ddos_attack.xlsx):
     """Loads data from a CSV or Excel file."""
     try:
         if file_path.endswith('.csv'):
