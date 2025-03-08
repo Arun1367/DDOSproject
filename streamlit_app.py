@@ -7,26 +7,6 @@ import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
-
-# Example Data (Replace with your actual data loading from a file)
-def load_data(devcontainer/ddos_attack.xlsx):
-    """Loads data from a CSV or Excel file."""
-    try:
-        if file_path.endswith('.csv'):
-            df = pd.read_csv(file_path)
-        elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
-            df = pd.read_excel(file_path)
-        else:
-            st.error("Unsupported file format. Please provide a CSV or Excel file.")
-            return None
-        return df
-    except FileNotFoundError:
-        st.error(f"File not found: {file_path}. Please provide a valid file.")
-        return None
-    except Exception as e:
-        st.error(f"An error occurred while loading the data: {e}")
-        return None
-
 # Replace 'your_data.csv' with the actual path to your data file.
 file_path = 'devcontainer/ddos_attack.xlsx'  # <--- Change this!
 df = load_data(devcontainer/ddos_attack.xlsx)
