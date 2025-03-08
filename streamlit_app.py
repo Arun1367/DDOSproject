@@ -1,5 +1,5 @@
 import streamlit as st
 
-st.title('🎈 App Name')
+st.title('DDOS ML PREDICTION'🛜)
 
-st.write('Hello world!')
+st.write('This is an app for predicting DDOS attack or Normal ')
