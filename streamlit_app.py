@@ -2,21 +2,30 @@ import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
+import streamlit as st
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from tensorflow import keras
 
 st.title('DDOS ML PREDICTION🛜')
 st.write('This is an app for predicting DDOS attack or Normal')
-
 # Function to load data
 def load_data(file_path):
     try:
-        return pd.read_csv(file_path)  # ✅ Using CSV instead of Excel
-    except Exception as e:
+        return pd.read_csv(file_path, quoting=1, error_bad_lines=False) #added quoting and error_bad_lines.
+    except FileNotFoundError:
+        st.error(f"File not found: {file_path}")
+        return None
+    except pd.errors.ParserError as e:
         st.error(f"Error loading file: {e}")
         return None
 
-# ✅ Use the correct raw GitHub URL for CSV file
-file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack%20(1).csv"
+# Replace with the correct raw file URL
+file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack%20(1).csv'  # <--- Replace with your raw URL, make sure it is a csv.
 df = load_data(file_path)
+
+# rest of your code
+
 
 if df is not None:
     # Preprocessing
