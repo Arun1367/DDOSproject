@@ -3,28 +3,19 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
-st.title('DDOS ML PREDICTION<0xF0><0x9F><0x97><0x8F>')
+st.title('DDOS ML PREDICTION🛜')
 st.write('This is an app for predicting DDOS attack or Normal')
 
 # Function to load data
 def load_data(file_path):
     try:
-        if file_path.endswith('.xlsx'):
-            return pd.read_excel(file_path, engine='openpyxl') #Explicitly use openpyxl
-        elif file_path.endswith('.xls'):
-            return pd.read_excel(file_path, engine='xlrd') #Explicitly use xlrd
-        else:
-            st.error("Unsupported file format. Please provide a CSV or Excel file.")
-            return None
-    except FileNotFoundError:
-        st.error(f"File not found: {file_path}")
-        return None
-    except ValueError as e:
+        return pd.read_excel(file_path)
+    except Exception as e:
         st.error(f"Error loading file: {e}")
         return None
 
-# Replace with the correct raw file URL
-file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.xlsx'  # <--- Replace with your raw URL
+# ✅ Use the raw GitHub URL
+file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.xlsx"
 df = load_data(file_path)
 
 if df is not None:
