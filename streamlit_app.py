@@ -16,8 +16,7 @@ def load_data(file_path):
 
 # ✅ Use the raw GitHub URL
 file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.xlsx"
-df = load_data(file_path)
-
+df = pd.read_csv(file_path)
 if df is not None:
     # Preprocessing
     if 'Label' in df.columns:
