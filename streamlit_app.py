@@ -9,7 +9,7 @@ st.write('This is an app for predicting DDOS attack or Normal')
 # Function to load data
 def load_data(file_path):
     try:
-        return pd.read_excel(file_path)
+        return pd.read_excel(file_path, engine="openpyxl")  # ✅ Fix: Specify engine
     except Exception as e:
         st.error(f"Error loading file: {e}")
         return None
