@@ -1,4 +1,5 @@
 import streamlit as st
+import csv
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
@@ -20,6 +21,7 @@ def load_data(file_path):
     except pd.errors.ParserError as e:
         st.error(f"Error loading file: {e}")
         return None
+
 
 
 # Replace with the correct raw file URL
