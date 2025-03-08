@@ -7,12 +7,19 @@ from sklearn.preprocessing import StandardScaler
 
 st.title("DDoS Attack Detection (CNN)")
 
-# Function to load real data
+# Load the dataset with debugging information
 @st.cache_data
 def load_real_data():
-    file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.csv"  # Ensure this file is uploaded in the same directory
+    file_path = "ddos_attack.csv"  # Make sure this file is uploaded
     try:
-        df = pd.read_csv(file_path, encoding='latin1', on_bad_lines='skip')
+        df = pd.read_csv(file_path, encoding='utf-8', on_bad_lines='skip')
+
+        # Debugging Step: Print Column Names
+        st.write("Dataset Columns:", df.columns.tolist())
+
+        # Remove unwanted spaces and special characters
+        df.columns = df.columns.str.strip()
+
         return df
     except Exception as e:
         st.error(f"Error loading file: {e}")
@@ -22,30 +29,29 @@ df = load_real_data()
 
 if df is not None:
     st.write("Dataset Loaded Successfully ✅")
-    
-    # Check if "Label" column exists
-    if 'Label' in df.columns:
-        # Convert labels to binary (0 - Benign, 1 - DDoS)
-        df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
-        
-        # Select numerical columns only
-        df = df.select_dtypes(include=[np.number])
-        
-        # Drop rows with missing values (or handle them accordingly)
-        df = df.dropna()
 
-        # Split features and labels
+    # Check if 'Label' exists
+    if any(col.lower() == 'label' for col in df.columns):
+        # Standardize column name (in case of variations like ' label ', 'LABEL', etc.)
+        df.rename(columns={col: 'Label' for col in df.columns if col.lower() == 'label'}, inplace=True)
+
+        # Convert labels to binary
+        df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
+
+        # Keep only numerical features
+        df = df.select_dtypes(include=[np.number]).dropna()
+
         X = df.drop(columns=['Label'])
         y = df['Label']
 
-        # Normalize the feature values
+        # Normalize the features
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
 
-        # Train-test split
+        # Split dataset
         X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-        # CNN Model Training
+        # Train CNN Model
         def train_cnn(X_train, y_train, X_test, y_test):
             X_train_reshaped = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
             X_test_reshaped = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
@@ -62,10 +68,9 @@ if df is not None:
             model.fit(X_train_reshaped, y_train, epochs=10, validation_data=(X_test_reshaped, y_test), verbose=0)
             return model
 
-        # Train the CNN model
         cnn_model = train_cnn(X_train, y_train, X_test, y_test)
 
-        # Streamlit App Interface
+        # Streamlit UI
         def main():
             st.sidebar.header("Input Features")
             input_features = {}
@@ -74,7 +79,7 @@ if df is not None:
 
             if st.button("Predict"):
                 input_df = pd.DataFrame([input_features])
-                input_scaled = scaler.transform(input_df)  # Normalize input
+                input_scaled = scaler.transform(input_df)
                 input_reshaped = input_scaled.reshape(1, input_scaled.shape[1], 1)
                 prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
 
@@ -87,4 +92,4 @@ if df is not None:
             main()
 
     else:
-        st.error("The dataset does not contain a 'Label' column.")
+        st.error("❌ No 'Label' column found in the dataset. Check column names above.")
