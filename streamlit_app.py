@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 import joblib  # To load the saved scaler
 
 # Load the pre-trained model
-model = tf.keras.models.load_model("https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_cnn_model.h5")
+model = tf.keras.models.load_model("ddos_cnn_model.h5")
 
 # Load the pre-trained scaler (optional if scaling was done)
 scaler = joblib.load("https://github.com/ABHISHEKSASA/DATA/blob/main/scaler.pkl")
