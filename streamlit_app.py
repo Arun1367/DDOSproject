@@ -72,5 +72,4 @@ if df is not None:
 
         if __name__ == "__main__":
             main()
-    else:
-        st.error("The loaded data does not contain a 'Label' column. Please ensure your data is correctly formatted.")
+
