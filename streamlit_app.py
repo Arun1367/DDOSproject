@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import tensorflow as tf
-import joblib  # For loading the scaler
+import joblib
 
 # Load the pre-trained model
 model = tf.keras.models.load_model("ddos_cnn_model.h5")
@@ -29,7 +29,7 @@ for feature in feature_names:
 # Convert inputs to a NumPy array
 X_new = np.array([list(inputs.values())]).reshape(1, -1)
 
-st.write("🔍 **Input Data:**", X_new)
+st.write("🔍 **Input Data Shape:**", X_new.shape)
 
 # Prediction Function
 def predict_ddos(features):
