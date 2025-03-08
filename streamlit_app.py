@@ -9,7 +9,13 @@ st.write('This is an app for predicting DDOS attack or Normal')
 # Function to load data
 def load_data(file_path):
     try:
-        return pd.read_excel(file_path)
+        if file_path.endswith('.xlsx'):
+            return pd.read_excel(file_path, engine='openpyxl') #Explicitly use openpyxl
+        elif file_path.endswith('.xls'):
+            return pd.read_excel(file_path, engine='xlrd') #Explicitly use xlrd
+        else:
+            st.error("Unsupported file format. Please provide a CSV or Excel file.")
+            return None
     except FileNotFoundError:
         st.error(f"File not found: {file_path}")
         return None
@@ -19,7 +25,7 @@ def load_data(file_path):
 
 # Replace with the correct raw file URL
 file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.xlsx'  # <--- Replace with your raw URL
-df = load_data(file_path)
+df = load_data.xlsx(file_path)
 
 if df is not None:
     # Preprocessing
