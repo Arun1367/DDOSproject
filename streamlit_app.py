@@ -1,15 +1,22 @@
 import streamlit as st
-
-st.title('DDOS ML PREDICTION🛜')
-
-st.write('This is an app for predicting DDOS attack or Normal ')
-import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
-# Replace 'your_data.csv' with the actual path to your data file.
-file_path = 'devcontainer/ddos_attack.xlsx'  # <--- Change this!
-df = load_data(devcontainer/ddos_attack.xlsx)
+
+st.title('DDOS ML PREDICTION🛜')
+st.write('This is an app for predicting DDOS attack or Normal')
+
+# Function to load data
+def load_data(file_path):
+    try:
+        return pd.read_excel(file_path)
+    except FileNotFoundError:
+        st.error(f"File not found: {file_path}")
+        return None
+
+# Replace with the correct path
+file_path = 'devcontainer/ddos_attack.xlsx'  
+df = load_data(file_path)  # ✅ Corrected
 
 if df is not None:
     # Preprocessing
@@ -41,22 +48,15 @@ if df is not None:
 
         # Streamlit App
         def main():
-            st.title("DDoS Attack Detection (CNN)")
-
             st.sidebar.header("Input Features")
-            input_features = {}
-            for col in X.columns:
-                input_features[col] = st.sidebar.number_input(f"{col}", value=X[col].mean())
+            input_features = {col: st.sidebar.number_input(f"{col}", value=X[col].mean()) for col in X.columns}
 
             if st.button("Predict"):
                 input_df = pd.DataFrame([input_features])
                 input_reshaped = input_df.values.reshape(1, input_df.shape[1], 1)
                 prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
 
-                if prediction[0] == 1:
-                    st.error("DDoS Attack Detected!")
-                else:
-                    st.success("Benign Traffic Detected!")
+                st.success("Benign Traffic Detected!") if prediction[0] == 0 else st.error("DDoS Attack Detected!")
 
         if __name__ == "__main__":
             main()
