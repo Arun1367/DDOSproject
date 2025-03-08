@@ -9,14 +9,15 @@ st.write('This is an app for predicting DDOS attack or Normal')
 # Function to load data
 def load_data(file_path):
     try:
-        return pd.read_excel(file_path, engine="openpyxl")  # ✅ Fix: Specify engine
+        return pd.read_csv(file_path)  # ✅ Using CSV instead of Excel
     except Exception as e:
         st.error(f"Error loading file: {e}")
         return None
 
-# ✅ Use the raw GitHub URL
-file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.xlsx"
-df = pd.read_csv(file_path)
+# ✅ Use the correct raw GitHub URL for CSV file
+file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.csv"
+df = load_data(file_path)
+
 if df is not None:
     # Preprocessing
     if 'Label' in df.columns:
