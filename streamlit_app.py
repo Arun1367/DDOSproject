@@ -15,7 +15,7 @@ def load_data(file_path):
         return None
 
 # ✅ Use the correct raw GitHub URL for CSV file
-file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.csv"
+file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack%20(1).csv"
 df = load_data(file_path)
 
 if df is not None:
