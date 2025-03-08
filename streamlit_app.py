@@ -12,7 +12,7 @@ st.write('This is an app for predicting DDOS attack or Normal')
 # Function to load data
 def load_data(file_path):
     try:
-        return pd.read_csv(file_path, encoding='latin1', quoting=1, error_bad_lines=False)) #added quoting and error_bad_lines.
+        return pd.read_csv(file_path, encoding='latin1', quoting=1, error_bad_lines=False) #added quoting and error_bad_lines.
     except FileNotFoundError:
         st.error(f"File not found: {file_path}")
         return None
