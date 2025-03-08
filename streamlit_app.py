@@ -5,16 +5,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from tensorflow import keras
 
-# Load dataset from CSV
+# File uploader (outside the cache)
+file = st.file_uploader("Upload CSV Dataset", type=["csv"])
+
+# Function to load dataset (only caching the reading process)
 @st.cache_data
-def load_data():
-    file = st.file_uploader("Upload CSV Dataset", type=["csv"])
+def load_data(file):
     if file is not None:
-        df = pd.read_csv(file)
-        return df
+        return pd.read_csv(file)
     return None
 
-df = load_data()
+df = load_data(file)  # Pass file as an argument
 
 if df is not None:
     # Check if 'Label' column exists
