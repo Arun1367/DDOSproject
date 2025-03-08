@@ -14,8 +14,8 @@ def load_data(file_path):
         st.error(f"File not found: {file_path}")
         return None
 
-# Replace with the correct path
-file_path = 'ddos_attack.xlsx'  
+# Replace with thehttps://github.com/ABHISHEKSASA/DATA correct path
+file_path = 'https://github.com/ABHISHEKSASA/DATA'  
 df = load_data(file_path)  # ✅ Corrected
 
 if df is not None:
