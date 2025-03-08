@@ -9,16 +9,18 @@ from tensorflow import keras
 
 st.title('DDOS ML PREDICTION🛜')
 st.write('This is an app for predicting DDOS attack or Normal')
-# Function to load data
+# Function to load dataimport csv
+
 def load_data(file_path):
     try:
-        return pd.read_csv(file_path, encoding='latin1', quoting=1, error_bad_lines=False) #added quoting and error_bad_lines.
+        return pd.read_csv(file_path, encoding='latin1', quoting=csv.QUOTE_NONE, on_bad_lines='skip')
     except FileNotFoundError:
         st.error(f"File not found: {file_path}")
         return None
     except pd.errors.ParserError as e:
         st.error(f"Error loading file: {e}")
         return None
+
 
 # Replace with the correct raw file URL
 file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack%20(1).csv'  # <--- Replace with your raw URL, make sure it is a csv.
