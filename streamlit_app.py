@@ -25,7 +25,7 @@ def load_data(file_path):
 
 # Replace with the correct raw file URL
 file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.xlsx'  # <--- Replace with your raw URL
-df = load_data.xlsx(file_path)
+df = load_data(file_path)
 
 if df is not None:
     # Preprocessing
