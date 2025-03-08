@@ -1,43 +1,53 @@
 import streamlit as st
 import numpy as np
 import tensorflow as tf
+import joblib  # For loading scaler
 from sklearn.preprocessing import StandardScaler
-import joblib  # To load the saved scaler
 
 # Load the pre-trained model
-model = tf.keras.models.load_model("ddos_cnn_model.h5")
+try:
+    model = tf.keras.models.load_model("ddos_cnn_model.h5")
+    st.success("✅ Model Loaded Successfully!")
+except Exception as e:
+    st.error(f"❌ Error Loading Model: {e}")
 
-# Load the pre-trained scaler (optional if scaling was done)
-scaler = joblib.load("scaler.pkl")
-features = df.columns[:]  # Assuming last column is the label
+# Load the pre-trained scaler
+try:
+    scaler = joblib.load("scaler.pkl")
+    st.success("✅ Scaler Loaded Successfully!")
+except Exception as e:
+    st.error(f"❌ Error Loading Scaler: {e}")
 
-# Create input fields with actual column names
-inputs = {}
-for feature in features:
-    inputs[feature] = st.number_input(f"Enter value for {feature}", value=0.0)
-
-# Convert inputs to DataFrame for prediction
-import numpy as np
-X_new = np.array([list(inputs.values())]).reshape(1, -1)
-
-st.write("Input Data:", X_new)
-# Define prediction function
-def predict_ddos(features):
-    features = np.array(features).reshape(1, -1)
-    features = scaler.transform(features)  # Scale input
-    prediction = model.predict(features)[0][0]
-    return "🚨 DDoS Attack Detected!" if prediction > 0.5 else "✅ Benign Traffic"
+# Define actual feature names (Replace with actual column names from your dataset)
+feature_names = [
+    "Destination Port", "Flow Duration", "Total Fwd Packets", "Total Backward Packets", 
+    "Total Length of Fwd Packets", "Total Length of Bwd Packets", "Flow IAT Mean", 
+    "Flow IAT Std", "Flow IAT Max", "Flow IAT Min"
+]  # ⚠️ Adjust this list to match your dataset
 
 # Streamlit UI
-st.title("DDoS Attack Detection with CNN")
+st.title("🚀 DDoS Attack Detection with CNN")
+st.write("Enter network traffic data below to check if it's an attack.")
 
-# Input fields
-feature_inputs = []
-for i in range(10):  # Change 10 to the number of features in your dataset
-    feature = st.number_input(f"Feature {i+1}", value=0.0)
-    feature_inputs.append(feature)
+# Create input fields dynamically based on feature names
+inputs = {}
+for feature in feature_names:
+    inputs[feature] = st.number_input(f"Enter value for {feature}", value=0.0)
+
+# Convert input to NumPy array
+X_new = np.array([list(inputs.values())]).reshape(1, -1)
+
+# Define prediction function
+def predict_ddos(features):
+    try:
+        features = np.array(features).reshape(1, -1)
+        features = scaler.transform(features)  # Scale input
+        prediction = model.predict(features)[0][0]
+        return "🚨 DDoS Attack Detected!" if prediction > 0.5 else "✅ Benign Traffic"
+    except Exception as e:
+        return f"❌ Prediction Error: {e}"
 
 # Predict button
 if st.button("Predict"):
-    result = predict_ddos(feature_inputs)
+    result = predict_ddos(list(inputs.values()))
     st.subheader(result)
