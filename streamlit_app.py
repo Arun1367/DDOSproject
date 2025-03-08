@@ -10,16 +10,10 @@ from sklearn.preprocessing import StandardScaler
 
 # Load Pretrained Models
 def load_model(model_name):
-    if model_name == "Random Forest":
-        return pickle.load(open("random_forest.pkl", "rb"))
-    elif model_name == "Logistic Regression":
-        return pickle.load(open("logistic_regression.pkl", "rb"))
-    elif model_name == "CNN":
+    if model_name == "CNN":
         return tf.keras.models.load_model("cnn_model.h5")
-    elif model_name == "RNN":
-        return tf.keras.models.load_model("rnn_model.h5")
-    elif model_name == "GAN":
-        return tf.keras.models.load_model("gan_model.h5")
+    elif model_name == "DNN":
+        return tf.keras.models.load_model("dnn_model.h5")
     return None
 
 # Feature Inputs
