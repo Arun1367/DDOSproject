@@ -8,21 +8,17 @@ from tensorflow import keras
 st.title("DDoS Attack Detection (CNN)")
 
 # File Uploader
-uploaded_file = st.file_uploader("upload the data", type=['csv'])
+uploaded_file = st.file_uploader("Upload your CSV file", type=['csv'])
 
 if uploaded_file is not None:
-    # Read the CSV File
     try:
+        # Read the CSV File
         df = pd.read_csv(uploaded_file)
         st.write("✅ Dataset Loaded Successfully!")
 
-        # Display dataset columns
-        st.write("### Dataset Columns:")
-        st.write(list(df.columns))
-
         # Check if 'Label' column exists
         if 'Label' not in df.columns:
-            st.error("❌ No 'Label' column found in the dataset. Check the column names above.")
+            st.error("❌ No 'Label' column found. Make sure your dataset has a 'Label' column.")
         else:
             # Convert Label column to binary (if needed)
             df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
@@ -56,23 +52,25 @@ if uploaded_file is not None:
             cnn_model = train_cnn(X_train, y_train, X_test, y_test)
             st.write("✅ Model Training Complete!")
 
-            # Sidebar for User Input
-            st.sidebar.header("Input Features")
-            input_features = {}
-            for col in X.columns:
-                input_features[col] = st.sidebar.number_input(f"{col}", value=float(X[col].mean()))
+            # Sidebar for Feature Selection
+            st.sidebar.header("Feature Selection")
+            selected_features = st.sidebar.multiselect("Select Features for Prediction", options=X.columns, default=X.columns[:5])
+
+            # Show Input Fields for Selected Features
+            st.sidebar.header("Input Values")
+            input_features = {col: st.sidebar.number_input(f"{col}", value=float(X[col].mean())) for col in selected_features}
 
             # Prediction Button
             if st.button("Predict"):
-                input_df = pd.DataFrame([input_features])
-                input_reshaped = input_df.values.reshape(1, input_df.shape[1], 1)
-                prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
-
-                # Display Prediction
-                if prediction[0] == 1:
-                    st.error("🚨 DDoS Attack Detected!")
+                if not selected_features:
+                    st.error("❌ Please select at least one feature for prediction.")
                 else:
-                    st.success("✅ Benign Traffic Detected!")
+                    input_df = pd.DataFrame([input_features])
+                    input_reshaped = input_df.values.reshape(1, input_df.shape[1], 1)
+                    prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
+
+                    # Display Prediction
+                    st.error("🚨 DDoS Attack Detected!") if prediction[0] == 1 else st.success("✅ Benign Traffic Detected!")
 
     except Exception as e:
         st.error(f"Error reading file: {e}")
