@@ -5,29 +5,27 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from tensorflow import keras
 
-# File uploader (outside the cache)
+# File uploader
 file = st.file_uploader("Upload CSV Dataset", type=["csv"])
 
-# Function to load dataset (only caching the reading process)
+# Load dataset function
 @st.cache_data
 def load_data(file):
     if file is not None:
         return pd.read_csv(file)
     return None
 
-df = load_data(file)  # Pass file as an argument
+df = load_data(file)
 
 if df is not None:
-    # Check if 'Label' column exists
     if "Label" not in df.columns:
         st.error("❌ No 'Label' column found in dataset. Please check your file!")
     else:
-        # Preprocessing
         df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
         X = df.drop(columns=['Label'])
         y = df['Label']
 
-        # Normalize input features
+        # Fit StandardScaler on full feature set
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
 
@@ -50,7 +48,6 @@ if df is not None:
             model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
             history = model.fit(X_train_reshaped, y_train, epochs=10, validation_data=(X_test_reshaped, y_test), verbose=1)
             
-            # Display accuracy
             loss, accuracy = model.evaluate(X_test_reshaped, y_test)
             st.write(f"✅ Model Accuracy: {accuracy * 100:.2f}%")
 
@@ -59,32 +56,26 @@ if df is not None:
         # Train model
         cnn_model, scaler = train_cnn(X_train, y_train, X_test, y_test)
 
-        # Streamlit App Interface
         st.title("🔍 DDoS Attack Detection with CNN")
 
         # Custom Feature Selection
         selected_features = st.multiselect("Select Features for Prediction", X.columns.tolist(), default=X.columns.tolist())
 
         if selected_features:
-            # User Inputs for Selected Features
-            input_features = {}
+            # Ensure input has all features (fill missing with 0)
+            input_features = {col: 0.0 for col in X.columns}  # Default all features to 0
             for feature in selected_features:
                 input_features[feature] = st.sidebar.number_input(f"{feature}", value=float(X[feature].mean()))
 
             if st.button("🔎 Predict"):
-                # Convert input into DataFrame
                 input_df = pd.DataFrame([input_features])
 
-                # Scale input
+                # Use previously fitted scaler to transform full feature set
                 input_scaled = scaler.transform(input_df)
 
-                # Reshape input
                 input_reshaped = input_scaled.reshape(1, input_scaled.shape[1], 1)
-
-                # Make Prediction
                 prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
 
-                # Display Result
                 if prediction[0] == 1:
                     st.error("🚨 DDoS Attack Detected!")
                 else:
