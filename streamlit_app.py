@@ -3,6 +3,21 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import StandardScaler
 import joblib  # To load the saved scaler
+import requests
+
+# Direct link to raw file (ensure it's accessible)
+model_url = "https://github.com/ABHISHEKSASA/DATA/blob/main/scaler.pkl"
+
+# Download the model
+model_path = "ddos_cnn_model.h5"
+response = requests.get(model_url)
+
+if response.status_code == 200:
+    with open(model_path, "wb") as file:
+        file.write(response.content)
+    print("✅ Model downloaded successfully!")
+else:
+    print(f"❌ Failed to download model! HTTP Status: {response.status_code}")
 
 # Load the pre-trained model
 model = tf.keras.models.load_model("ddos_cnn_model.h5")
