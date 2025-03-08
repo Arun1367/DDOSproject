@@ -8,7 +8,7 @@ import joblib  # To load the saved scaler
 model = tf.keras.models.load_model("ddos_cnn_model.h5")
 
 # Load the pre-trained scaler (optional if scaling was done)
-scaler = joblib.load("https://github.com/ABHISHEKSASA/DATA/blob/main/scaler.pkl")
+scaler = joblib.load("scaler.pkl")
 
 # Define prediction function
 def predict_ddos(features):
