@@ -25,7 +25,7 @@ def load_data(file_path):
 
 
 # Replace with the correct raw file URL
-file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack%20(1).csv'  # <--- Replace with your raw URL, make sure it is a csv.
+file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.csv'  # <--- Replace with your raw URL, make sure it is a csv.
 df = load_data(file_path) # or encoding='utf-8'
 # rest of your code
 
