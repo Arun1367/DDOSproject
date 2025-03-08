@@ -68,4 +68,7 @@ if uploaded_file is not None:
 
                     prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
                     st.error("🚨 DDoS Attack Detected!") if prediction[0] == 1 else st.success("✅ Benign Traffic Detected!")
+                except Exception as e:
+                        st.error(f"Error reading file: {e}")
+        
 
