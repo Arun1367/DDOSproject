@@ -20,21 +20,7 @@ def create_dummy_data():
         'Total Backward Packets': np.random.randint(1, 100, num_samples),
         'Total Length of Fwd Packets': np.random.randint(0, 10000, num_samples),
         'Total Length of Bwd Packets': np.random.randint(0, 10000, num_samples),
-        'Fwd Packet Length Max': np.random.randint(0, 1000, num_samples),
-        'Fwd Packet Length Min': np.random.randint(0, 500, num_samples),
-        'Fwd Packet Length Mean': np.random.uniform(0, 750, num_samples),
-        'Fwd Packet Length Std': np.random.uniform(0, 200, num_samples),
-        'Bwd Packet Length Max': np.random.randint(0, 1000, num_samples),
-        'Bwd Packet Length Min': np.random.randint(0, 500, num_samples),
-        'Bwd Packet Length Mean': np.random.uniform(0, 750, num_samples),
-        'Bwd Packet Length Std': np.random.uniform(0, 200, num_samples),
-        'Flow Bytes/s': np.random.uniform(0, 100000, num_samples),
-        'Flow Packets/s': np.random.uniform(0, 10000, num_samples),
-        'Flow IAT Mean': np.random.uniform(0, 500000, num_samples),
-        'Flow IAT Std': np.random.uniform(0, 200000, num_samples),
-        'Flow IAT Max': np.random.randint(0, 1000000, num_samples),
-        'Flow IAT Min': np.random.randint(0, 500000, num_samples),
-        'Label': np.random.choice(['Benign', 'DDoS'], num_samples),
+       
     }
     return pd.DataFrame(data)
 
