@@ -8,7 +8,7 @@ from tensorflow import keras
 st.title("DDoS Attack Detection (CNN)")
 
 # File Uploader
-uploaded_file = st.file_uploader("https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.csv", type=['csv'])
+uploaded_file = st.file_uploader("upload the data", type=['csv'])
 
 if uploaded_file is not None:
     # Read the CSV File
