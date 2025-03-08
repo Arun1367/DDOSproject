@@ -10,7 +10,7 @@ st.title("DDoS Attack Detection (CNN)")
 # Function to load real data
 @st.cache_data
 def load_real_data():
-    file_path = "ddos_attack.csv"  # Ensure this file is uploaded in the same directory
+    file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.csv"  # Ensure this file is uploaded in the same directory
     try:
         df = pd.read_csv(file_path, encoding='latin1', on_bad_lines='skip')
         return df
