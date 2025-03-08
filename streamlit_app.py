@@ -5,31 +5,36 @@ st.title('DDOS ML PREDICTION🛜')
 st.write('This is an app for predicting DDOS attack or Normal ')
 import streamlit as st
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
 # Example Data (Replace with your actual data loading from a file)
-def load_data(devcontainer/ddos_attack.xlsx):
-    """Loads data from a CSV file (or your data source)."""
+def load_data():
+    """Loads data from a CSV or Excel file."""
     try:
-        df = pd.read_csv(file_path)
+        if file_path.endswith('.csv'):
+            df = pd.read_csv(file_path)
+        elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
+            df = pd.read_excel(file_path)
+        else:
+            st.error("Unsupported file format. Please provide a CSV or Excel file.")
+            return None
         return df
     except FileNotFoundError:
-        st.error(f"File not found: {file_path}. Please provide a valid CSV file.")
+        st.error(f"File not found: {file_path}. Please provide a valid file.")
         return None
     except Exception as e:
         st.error(f"An error occurred while loading the data: {e}")
         return None
 
 # Replace 'your_data.csv' with the actual path to your data file.
-file_path = 'your_data.csv'  # <--- Change this!
+file_path = 'devcontainer/ddos_attack.xlsx'  # <--- Change this!
 df = load_data(file_path)
 
-if df is not None: # only execute if data loaded correctly.
+if df is not None:
     # Preprocessing
-    if 'Label' in df.columns: #check if label column exists.
-        df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1}) #map the benign/DDoS labels.
+    if 'Label' in df.columns:
+        df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
         X = df.drop('Label', axis=1)
         y = df['Label']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
