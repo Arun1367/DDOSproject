@@ -9,7 +9,7 @@ model = tf.keras.models.load_model("ddos_cnn_model.h5")
 
 # Load the pre-trained scaler (optional if scaling was done)
 scaler = joblib.load("scaler.pkl")
-features = df.columns[:-1]  # Assuming last column is the label
+features = df.columns[:]  # Assuming last column is the label
 
 # Create input fields with actual column names
 inputs = {}
