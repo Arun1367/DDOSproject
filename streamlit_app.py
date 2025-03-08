@@ -20,7 +20,7 @@ def create_dummy_data():
         'Total Backward Packets': np.random.randint(1, 100, num_samples),
         'Total Length of Fwd Packets': np.random.randint(0, 10000, num_samples),
         'Total Length of Bwd Packets': np.random.randint(0, 10000, num_samples),
-       
+        'Label': np.random.choice(['Benign', 'DDoS'], num_samples),
     }
     return pd.DataFrame(data)
 
