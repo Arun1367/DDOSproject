@@ -15,7 +15,7 @@ def load_data(file_path):
         return None
 
 # Replace with the correct path
-file_path = 'devcontainer/ddos_attack.xlsx'  
+file_path = 'ddos_attack.xlsx'  
 df = load_data(file_path)  # ✅ Corrected
 
 if df is not None:
