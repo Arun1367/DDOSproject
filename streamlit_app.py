@@ -3,37 +3,52 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
-import csv
+from sklearn.preprocessing import StandardScaler
 
-st.title('DDOS ML PREDICTION 🛜')
-st.write('This is an app for predicting DDOS attacks or Normal traffic.')
+st.title("DDoS Attack Detection (CNN)")
 
-# Function to load dataset
-def load_data(file_path):
+# Function to load real data
+@st.cache_data
+def load_real_data():
+    file_path = "https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack.csv"  # Ensure this file is uploaded in the same directory
     try:
-        return pd.read_csv(file_path, encoding='latin1', quoting=csv.QUOTE_NONE, on_bad_lines='skip')
-    except FileNotFoundError:
-        st.error(f"File not found: {file_path}")
-        return None
-    except pd.errors.ParserError as e:
+        df = pd.read_csv(file_path, encoding='latin1', on_bad_lines='skip')
+        return df
+    except Exception as e:
         st.error(f"Error loading file: {e}")
         return None
 
-# Load dataset from GitHub or local file
-file_path = 'https://raw.githubusercontent.com/ABHISHEKSASA/DATA/main/ddos_attack.csv'  # Ensure raw file link is used
-df = load_data(file_path)
+df = load_real_data()
 
 if df is not None:
+    st.write("Dataset Loaded Successfully ✅")
+    
+    # Check if "Label" column exists
     if 'Label' in df.columns:
+        # Convert labels to binary (0 - Benign, 1 - DDoS)
         df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
-        X = df.drop('Label', axis=1)
+        
+        # Select numerical columns only
+        df = df.select_dtypes(include=[np.number])
+        
+        # Drop rows with missing values (or handle them accordingly)
+        df = df.dropna()
+
+        # Split features and labels
+        X = df.drop(columns=['Label'])
         y = df['Label']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=50)
+
+        # Normalize the feature values
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        # Train-test split
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
         # CNN Model Training
         def train_cnn(X_train, y_train, X_test, y_test):
-            X_train_reshaped = X_train.values.reshape(X_train.shape[0], X_train.shape[1], 1)
-            X_test_reshaped = X_test.values.reshape(X_test.shape[0], X_test.shape[1], 1)
+            X_train_reshaped = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
+            X_test_reshaped = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
 
             model = keras.Sequential([
                 keras.layers.Conv1D(32, 3, activation='relu', input_shape=(X_train.shape[1], 1)),
@@ -50,23 +65,26 @@ if df is not None:
         # Train the CNN model
         cnn_model = train_cnn(X_train, y_train, X_test, y_test)
 
-        # Streamlit App UI
+        # Streamlit App Interface
         def main():
             st.sidebar.header("Input Features")
-            input_features = {col: st.sidebar.number_input(f"{col}", value=float(X[col].mean())) for col in X.columns}
+            input_features = {}
+            for col, mean_val in zip(X.columns, X.mean()):
+                input_features[col] = st.sidebar.number_input(f"{col}", value=float(mean_val))
 
             if st.button("Predict"):
                 input_df = pd.DataFrame([input_features])
-                input_reshaped = input_df.values.reshape(1, input_df.shape[1], 1)
+                input_scaled = scaler.transform(input_df)  # Normalize input
+                input_reshaped = input_scaled.reshape(1, input_scaled.shape[1], 1)
                 prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
 
                 if prediction[0] == 1:
-                    st.error("DDoS Attack Detected!")
+                    st.error("🚨 DDoS Attack Detected! 🚨")
                 else:
-                    st.success("Benign Traffic Detected!")
+                    st.success("✅ Benign Traffic Detected!")
 
         if __name__ == "__main__":
             main()
 
     else:
-        st.error("The loaded data does not contain a 'Label' column. Please ensure your dataset is formatted correctly.")
+        st.error("The dataset does not contain a 'Label' column.")
