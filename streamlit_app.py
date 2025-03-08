@@ -12,7 +12,7 @@ st.write('This is an app for predicting DDOS attack or Normal')
 # Function to load data
 def load_data(file_path):
     try:
-        return pd.read_csv(file_path, quoting=1, error_bad_lines=False) #added quoting and error_bad_lines.
+        return pd.read_csv(file_path, encoding='latin1', quoting=1, error_bad_lines=False)) #added quoting and error_bad_lines.
     except FileNotFoundError:
         st.error(f"File not found: {file_path}")
         return None
@@ -22,8 +22,7 @@ def load_data(file_path):
 
 # Replace with the correct raw file URL
 file_path = 'https://github.com/ABHISHEKSASA/DATA/blob/main/ddos_attack%20(1).csv'  # <--- Replace with your raw URL, make sure it is a csv.
-df = load_data(file_path)
-
+df = load_data(file_path) # or encoding='utf-8'
 # rest of your code
 
 
