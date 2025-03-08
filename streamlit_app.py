@@ -9,7 +9,18 @@ model = tf.keras.models.load_model("ddos_cnn_model.h5")
 
 # Load the pre-trained scaler (optional if scaling was done)
 scaler = joblib.load("scaler.pkl")
+features = df.columns[:-1]  # Assuming last column is the label
 
+# Create input fields with actual column names
+inputs = {}
+for feature in features:
+    inputs[feature] = st.number_input(f"Enter value for {feature}", value=0.0)
+
+# Convert inputs to DataFrame for prediction
+import numpy as np
+X_new = np.array([list(inputs.values())]).reshape(1, -1)
+
+st.write("Input Data:", X_new)
 # Define prediction function
 def predict_ddos(features):
     features = np.array(features).reshape(1, -1)
