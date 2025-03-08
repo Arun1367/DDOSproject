@@ -3,54 +3,87 @@ import streamlit as st
 st.title('DDOS ML PREDICTION🛜')
 
 st.write('This is an app for predicting DDOS attack or Normal ')
-import pickle
+import streamlit as st
+import pandas as pd
 import numpy as np
-import tensorflow as tf
-from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from tensorflow import keras
 
-# Load Pretrained Models
-def load_model(model_name):
-    if model_name == "CNN":
-        return tf.keras.models.load_model("cnn_model.h5")
-    elif model_name == "DNN":
-        return tf.keras.models.load_model("dnn_model.h5")
-    return None
+# Sample Data (Replace with your actual data loading)
+def create_dummy_data():
+    np.random.seed(42)
+    num_samples = 1000
+    data = {
+        'Destination Port': np.random.randint(1, 65536, num_samples),
+        'Flow Duration': np.random.randint(1000, 1000000, num_samples),
+        'Total Fwd Packets': np.random.randint(1, 100, num_samples),
+        'Total Backward Packets': np.random.randint(1, 100, num_samples),
+        'Total Length of Fwd Packets': np.random.randint(0, 10000, num_samples),
+        'Total Length of Bwd Packets': np.random.randint(0, 10000, num_samples),
+        'Fwd Packet Length Max': np.random.randint(0, 1000, num_samples),
+        'Fwd Packet Length Min': np.random.randint(0, 500, num_samples),
+        'Fwd Packet Length Mean': np.random.uniform(0, 750, num_samples),
+        'Fwd Packet Length Std': np.random.uniform(0, 200, num_samples),
+        'Bwd Packet Length Max': np.random.randint(0, 1000, num_samples),
+        'Bwd Packet Length Min': np.random.randint(0, 500, num_samples),
+        'Bwd Packet Length Mean': np.random.uniform(0, 750, num_samples),
+        'Bwd Packet Length Std': np.random.uniform(0, 200, num_samples),
+        'Flow Bytes/s': np.random.uniform(0, 100000, num_samples),
+        'Flow Packets/s': np.random.uniform(0, 10000, num_samples),
+        'Flow IAT Mean': np.random.uniform(0, 500000, num_samples),
+        'Flow IAT Std': np.random.uniform(0, 200000, num_samples),
+        'Flow IAT Max': np.random.randint(0, 1000000, num_samples),
+        'Flow IAT Min': np.random.randint(0, 500000, num_samples),
+        'Label': np.random.choice(['Benign', 'DDoS'], num_samples),
+    }
+    return pd.DataFrame(data)
 
-# Feature Inputs
-st.title("DDoS Attack Prediction App")
-st.sidebar.header("User Input Features")
+df = create_dummy_data()
 
-features = ['Destination Port', 'Flow Duration', 'Total Fwd Packets',
-            'Total Backward Packets', 'Total Length of Fwd Packets',
-            'Total Length of Bwd Packets', 'Fwd Packet Length Max',
-            'Fwd Packet Length Min', 'Fwd Packet Length Mean',
-            'Fwd Packet Length Std', 'Bwd Packet Length Max',
-            'Bwd Packet Length Min', 'Bwd Packet Length Mean',
-            'Bwd Packet Length Std', 'Flow Bytes/s', 'Flow Packets/s',
-            'Flow IAT Mean', 'Flow IAT Std', 'Flow IAT Max', 'Flow IAT Min']
+# Preprocessing
+df['Label'] = df['Label'].map({'Benign': 0, 'DDoS': 1})
+X = df.drop('Label', axis=1)
+y = df['Label']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-user_input = {}
-for feature in features:
-    user_input[feature] = st.sidebar.number_input(feature, value=0.0)
+# CNN Model Training
+def train_cnn(X_train, y_train, X_test, y_test):
+    X_train_reshaped = X_train.values.reshape(X_train.shape[0], X_train.shape[1], 1)
+    X_test_reshaped = X_test.values.reshape(X_test.shape[0], X_test.shape[1], 1)
 
-user_data = np.array(list(user_input.values())).reshape(1, -1)
+    model = keras.Sequential([
+        keras.layers.Conv1D(32, 3, activation='relu', input_shape=(X_train.shape[1], 1)),
+        keras.layers.MaxPooling1D(2),
+        keras.layers.Flatten(),
+        keras.layers.Dense(64, activation='relu'),
+        keras.layers.Dense(1, activation='sigmoid')
+    ])
 
-# Choose Model
-model_choice = st.sidebar.selectbox("Select Model", ["Random Forest", "Logistic Regression", "CNN", "RNN", "GAN"])
-model = load_model(model_choice)
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    model.fit(X_train_reshaped, y_train, epochs=10, validation_data=(X_test_reshaped, y_test), verbose=0)
+    return model
 
-# Preprocess Input (Standardization)
-scaled_input = scaler.transform(user_data)
+# Train the CNN model
+cnn_model = train_cnn(X_train, y_train, X_test, y_test)
 
-# Make Prediction
-if st.button("Predict"):
-    if model_choice in ["Random Forest", "Logistic Regression"]:
-        prediction = model.predict(scaled_input)
-    else:
-        prediction = model.predict(scaled_input)
-        prediction = np.argmax(prediction, axis=1)  # Convert softmax output to class
-    
-    result = "DDoS Attack Detected!" if prediction[0] == 1 else "Traffic is Normal."
-    st.write(f"Prediction: {result}")
+# Streamlit App
+def main():
+    st.title("DDoS Attack Detection (CNN)")
 
-st.write("App is ready for testing!")
+    st.sidebar.header("Input Features")
+    input_features = {}
+    for col in X.columns:
+        input_features[col] = st.sidebar.number_input(f"{col}", value=X[col].mean())
+
+    if st.button("Predict"):
+        input_df = pd.DataFrame([input_features])
+        input_reshaped = input_df.values.reshape(1, input_df.shape[1], 1)
+        prediction = (cnn_model.predict(input_reshaped) > 0.5).astype("int32")
+
+        if prediction[0] == 1:
+            st.error("DDoS Attack Detected!")
+        else:
+            st.success("Benign Traffic Detected!")
+
+if __name__ == "__main__":
+    main()
