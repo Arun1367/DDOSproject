@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
-st.title('DDOS ML PREDICTION🛜')
+st.title('DDOS ML PREDICTION<0xF0><0x9F><0x97><0x8F>')
 st.write('This is an app for predicting DDOS attack or Normal')
 
 # Function to load data
@@ -13,10 +13,13 @@ def load_data(file_path):
     except FileNotFoundError:
         st.error(f"File not found: {file_path}")
         return None
+    except ValueError as e:
+        st.error(f"Error loading file: {e}")
+        return None
 
-# Replace with thehttps://github.com/ABHISHEKSASA/DATA correct path
-file_path = 'https://github.com/ABHISHEKSASA/DATA'  
-df = load_data(file_path)  # ✅ Corrected
+# Replace with the correct raw file URL
+file_path = 'https://raw.githubusercontent.com/ABHISHEKSASA/DATA/main/your_file.xlsx'  # <--- Replace with your raw URL
+df = load_data(file_path)
 
 if df is not None:
     # Preprocessing
