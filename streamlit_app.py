@@ -40,7 +40,6 @@ model_choice = st.sidebar.selectbox("Select Model", ["Random Forest", "Logistic 
 model = load_model(model_choice)
 
 # Preprocess Input (Standardization)
-scaler = pickle.load(open("scaler.pkl", "rb"))
 scaled_input = scaler.transform(user_data)
 
 # Make Prediction
