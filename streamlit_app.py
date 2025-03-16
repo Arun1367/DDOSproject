@@ -6,7 +6,7 @@ import tensorflow as tf
 # Load the CNN model (Ensure the model file is in the same directory)
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("ddos_cnn_model.h5")  # Local model file
+    model = tf.keras.models.load_model("ddos_cnn_model (1).h5")  # Local model file
     return model
 
 cnn_model = load_model()
