@@ -6,7 +6,7 @@ import tensorflow as tf
 # Load the CNN model (Ensure the model file is in the same directory)
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("ddos_cnn_model (1).h5")  # Local model file
+    model = tf.keras.models.load_model("ddos_cnn_model.h5")  # Update path if needed
     return model
 
 cnn_model = load_model()
@@ -21,11 +21,14 @@ def generate_random_data():
     flow_packets_per_s = np.random.uniform(10, 200)
     flow_iat_mean = np.random.uniform(0.1, 500)
 
-    # Return data as a NumPy array with correct shape (1 sample, 7 features)
+    # Convert to float32 and return as a NumPy array
     return np.array([[destination_port, flow_duration, fwd_packet_length_mean, 
-                      bwd_packet_length_mean, flow_bytes_per_s, flow_packets_per_s, flow_iat_mean]])
+                      bwd_packet_length_mean, flow_bytes_per_s, flow_packets_per_s, flow_iat_mean]], dtype=np.float32)
 
 st.title("🔄 Live DDoS Attack Prediction")
+
+# Display model input shape for debugging
+st.write("### **Model Expected Input Shape:**", cnn_model.input_shape)
 
 # Continuous Prediction Button
 if st.button("Start Continuous Prediction"):
@@ -35,6 +38,10 @@ if st.button("Start Continuous Prediction"):
         # Generate new data
         input_data = generate_random_data()
         
+        # If model expects 3D input (1, 7, 1), reshape
+        if len(cnn_model.input_shape) == 3:  
+            input_data = input_data.reshape(1, 7, 1)
+
         # Make a prediction using the CNN model
         prediction = cnn_model.predict(input_data)
         
