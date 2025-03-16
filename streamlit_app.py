@@ -6,7 +6,7 @@ import tensorflow as tf
 # Load the CNN model
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("ddos_cnn_model(1).h5")  # Change path if needed
+    model = tf.keras.models.load_model("ddos_cnn_model (1).h5")  # Change path if needed
     return model
 
 cnn_model = load_model()
