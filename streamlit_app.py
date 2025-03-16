@@ -1,32 +1,37 @@
 import streamlit as st
 import numpy as np
 import time
-import tensorflow as tf  # Assuming your CNN model is built with TensorFlow/Keras
+import tensorflow as tf  
 
-# Load your pre-trained CNN model
+# Load the CNN model (Ensure the model file is in the same directory)
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("https://github.com/ABHISHEKSASA/DDOSproject/blob/master/ddos_cnn_model%20(1).h5")  # Change with your model path
+    model = tf.keras.models.load_model("ddos_cnn_model.h5")  # Local model file
     return model
 
 cnn_model = load_model()
 
-# Function to generate random test data
+# Function to generate random test data based on your feature set
 def generate_random_data():
-    flow_duration = np.random.randint(500, 5000)
-    packet_length_mean = np.random.randint(100, 1000)
-    flow_packets_per_s = np.random.uniform(10, 200)
     destination_port = np.random.choice([80, 443, 22, 53])
-    
-    return np.array([[flow_duration, packet_length_mean, flow_packets_per_s, destination_port]])
+    flow_duration = np.random.randint(500, 5000)
+    fwd_packet_length_mean = np.random.randint(100, 1000)
+    bwd_packet_length_mean = np.random.randint(100, 1000)
+    flow_bytes_per_s = np.random.uniform(1000, 1000000)
+    flow_packets_per_s = np.random.uniform(10, 200)
+    flow_iat_mean = np.random.uniform(0.1, 500)
+
+    # Return data as a NumPy array with correct shape (1 sample, 7 features)
+    return np.array([[destination_port, flow_duration, fwd_packet_length_mean, 
+                      bwd_packet_length_mean, flow_bytes_per_s, flow_packets_per_s, flow_iat_mean]])
 
 st.title("🔄 Live DDoS Attack Prediction")
 
-# Button to start continuous prediction
+# Continuous Prediction Button
 if st.button("Start Continuous Prediction"):
-    st.write("Generating live network traffic data and predicting continuously...")
-    
-    while True:
+    st.write("Generating live network traffic data and predicting...")
+
+    for _ in range(5):  # Prevent infinite loop by limiting predictions
         # Generate new data
         input_data = generate_random_data()
         
@@ -37,8 +42,15 @@ if st.button("Start Continuous Prediction"):
         result = "🚀 **DDoS Attack Detected!**" if prediction[0][0] > 0.5 else "✅ **Normal Traffic**"
         
         # Display data and prediction
-        st.write("**Generated Input Data:**", input_data)
-        st.write("**Prediction:**", result)
+        st.write("### **Generated Input Data:**")
+        st.write(f"Destination Port: {input_data[0][0]}")
+        st.write(f"Flow Duration: {input_data[0][1]}")
+        st.write(f"Fwd Packet Length Mean: {input_data[0][2]}")
+        st.write(f"Bwd Packet Length Mean: {input_data[0][3]}")
+        st.write(f"Flow Bytes/s: {input_data[0][4]}")
+        st.write(f"Flow Packets/s: {input_data[0][5]}")
+        st.write(f"Flow IAT Mean: {input_data[0][6]}")
+        st.write("### **Prediction:**", result)
         
         # Wait before generating new data
         time.sleep(2)  # Adjust time interval (in seconds)
