@@ -7,7 +7,7 @@ import pickle
 # Load the CNN model
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("ddos_cnn_model (3).h5")  # Ensure this path is correct
+    model = tf.keras.models.load_model("ddos_cnn_model (2).h5")  # Ensure this path is correct
     return model
 
 cnn_model = load_model()
