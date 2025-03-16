@@ -1,44 +1,44 @@
 import streamlit as st
 import numpy as np
-import tensorflow as tf
-import joblib
+import time
+import tensorflow as tf  # Assuming your CNN model is built with TensorFlow/Keras
 
-# Load the pre-trained model
-model = tf.keras.models.load_model("ddos_cnn_model.h5")
+# Load your pre-trained CNN model
+@st.cache_resource
+def load_model():
+    model = tf.keras.models.load_model("ddos_cnn_model.h5")  # Change with your model path
+    return model
 
-# Load the pre-trained scaler
-scaler = joblib.load("scaler.pkl")
+cnn_model = load_model()
 
-# Define feature names based on your dataset
-feature_names = [
-    "Destination", "Flow Duration", "Total Fwd Packets", "Total Backward Packets",
-    "Total Length of Fwd Packets", "Total Length of Bwd Packets", "Fwd Packet Length Max",
-    "Fwd Packet Length Min", "Fwd Packet Length Mean", "Fwd Packet Length Std",
-    "Bwd Packet Length Max", "Bwd Packet Length Min", "Bwd Packet Length Mean",
-    "Bwd Packet Length Std", "Flow Bytes/s", "Flow Packets/s", "Flow IAT Mean"
-]
+# Function to generate random test data
+def generate_random_data():
+    flow_duration = np.random.randint(500, 5000)
+    packet_length_mean = np.random.randint(100, 1000)
+    flow_packets_per_s = np.random.uniform(10, 200)
+    destination_port = np.random.choice([80, 443, 22, 53])
+    
+    return np.array([[flow_duration, packet_length_mean, flow_packets_per_s, destination_port]])
 
-# Streamlit UI
-st.title("🚀 DDoS Attack Detection with CNN")
+st.title("🔄 Live DDoS Attack Prediction")
 
-# Collect user inputs for all features
-inputs = {}
-for feature in feature_names:
-    inputs[feature] = st.number_input(f"Enter value for {feature}", value=0.0)
-
-# Convert inputs to a NumPy array
-X_new = np.array([list(inputs.values())]).reshape(1, -1)
-
-st.write("🔍 **Input Data Shape:**", X_new.shape)
-
-# Prediction Function
-def predict_ddos(features):
-    features = np.array(features).reshape(1, -1)
-    features = scaler.transform(features)  # Scale input
-    prediction = model.predict(features)[0][0]
-    return "🚨 DDoS Attack Detected!" if prediction > 0.5 else "✅ Benign Traffic"
-
-# Predict button
-if st.button("🔍 Predict"):
-    result = predict_ddos(X_new)
-    st.subheader(result)
+# Button to start continuous prediction
+if st.button("Start Continuous Prediction"):
+    st.write("Generating live network traffic data and predicting continuously...")
+    
+    while True:
+        # Generate new data
+        input_data = generate_random_data()
+        
+        # Make a prediction using the CNN model
+        prediction = cnn_model.predict(input_data)
+        
+        # Interpret prediction (assuming binary classification: 0 = Normal, 1 = DDoS Attack)
+        result = "🚀 **DDoS Attack Detected!**" if prediction[0][0] > 0.5 else "✅ **Normal Traffic**"
+        
+        # Display data and prediction
+        st.write("**Generated Input Data:**", input_data)
+        st.write("**Prediction:**", result)
+        
+        # Wait before generating new data
+        time.sleep(2)  # Adjust time interval (in seconds)
