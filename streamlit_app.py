@@ -1,18 +1,27 @@
 import streamlit as st
 import numpy as np
 import time
-import tensorflow as tf  
+import tensorflow as tf
+import pickle
 
 # Load the CNN model
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("ddos_cnn_model (1).h5")  # Change path if needed
+    model = tf.keras.models.load_model("ddos_cnn_model.h5")  # Ensure this path is correct
     return model
 
 cnn_model = load_model()
 
-# Print model input shape for debugging
-st.write("### **Model Input Shape:**", cnn_model.input_shape)
+# Load the saved scaler
+@st.cache_resource
+def load_scaler():
+    with open("scaler.pkl", "rb") as f:
+        scaler = pickle.load(f)
+    return scaler
+
+scaler = load_scaler()
+
+st.title("🔄 Live DDoS Attack Prediction")
 
 # Function to generate random test data
 def generate_random_data():
@@ -23,12 +32,10 @@ def generate_random_data():
     flow_bytes_per_s = np.random.uniform(1000, 1000000)
     flow_packets_per_s = np.random.uniform(10, 200)
     flow_iat_mean = np.random.uniform(0.1, 500)
-
-    # Convert to float32 and return as a NumPy array
-    return np.array([[destination_port, flow_duration, fwd_packet_length_mean, 
+    
+    data = np.array([[destination_port, flow_duration, fwd_packet_length_mean, 
                       bwd_packet_length_mean, flow_bytes_per_s, flow_packets_per_s, flow_iat_mean]], dtype=np.float32)
-
-st.title("🔄 Live DDoS Attack Prediction")
+    return data
 
 # Continuous Prediction Button
 if st.button("Start Continuous Prediction"):
@@ -36,20 +43,20 @@ if st.button("Start Continuous Prediction"):
 
     for _ in range(5):  # Prevent infinite loop for testing
         input_data = generate_random_data()
-
+        
+        # Scale the input data
+        scaled_input_data = scaler.transform(input_data)
+        
         # **Fixing the input shape issue**
         model_input_shape = cnn_model.input_shape
         
-        if len(model_input_shape) == 3:  # If model expects 3D input (e.g., (None, 7, 1))
-            input_data = input_data.reshape(1, 7, 1)
-        elif len(model_input_shape) == 2:  # If model expects 2D input (e.g., (None, 7))
-            input_data = input_data.reshape(1, 7)
-        
-        # **Debugging Output**
-        st.write("### **Processed Input Shape:**", input_data.shape)
+        if len(model_input_shape) == 3:  # If model expects 3D input
+            scaled_input_data = scaled_input_data.reshape(1, 7, 1)
+        elif len(model_input_shape) == 2:  # If model expects 2D input
+            scaled_input_data = scaled_input_data.reshape(1, 7)
         
         # Predict using the CNN model
-        prediction = cnn_model.predict(input_data)
+        prediction = cnn_model.predict(scaled_input_data)
 
         # Interpret prediction (0 = Normal, 1 = DDoS)
         result = "🚀 **DDoS Attack Detected!**" if prediction[0][0] > 0.5 else "✅ **Normal Traffic**"
