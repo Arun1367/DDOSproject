@@ -6,7 +6,7 @@ import tensorflow as tf  # Assuming your CNN model is built with TensorFlow/Kera
 # Load your pre-trained CNN model
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("ddos_cnn_model.h5")  # Change with your model path
+    model = tf.keras.models.load_model("https://github.com/ABHISHEKSASA/DDOSproject/blob/master/ddos_cnn_model%20(1).h5")  # Change with your model path
     return model
 
 cnn_model = load_model()
