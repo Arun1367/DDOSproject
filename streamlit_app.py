@@ -52,7 +52,6 @@ if st.button("Predict DDoS Attack"):
     prediction = cnn_model.predict(scaled_input_data)
 
     # Print raw probability for debugging
-    st.write(f"### **Raw Model Output:** {prediction[0][0]:.4f}")
 
     # Interpret prediction (Adjust threshold if needed)
     threshold = 0.5  # Adjust if necessary (e.g., 0.3 for more sensitivity)
