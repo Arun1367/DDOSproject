@@ -3,15 +3,18 @@ import numpy as np
 import time
 import tensorflow as tf  
 
-# Load the CNN model (Ensure the model file is in the same directory)
+# Load the CNN model
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("ddos_cnn_model (1).h5")  # Update path if needed
+    model = tf.keras.models.load_model("ddos_cnn_model(1).h5")  # Change path if needed
     return model
 
 cnn_model = load_model()
 
-# Function to generate random test data based on your feature set
+# Print model input shape for debugging
+st.write("### **Model Input Shape:**", cnn_model.input_shape)
+
+# Function to generate random test data
 def generate_random_data():
     destination_port = np.random.choice([80, 443, 22, 53])
     flow_duration = np.random.randint(500, 5000)
@@ -27,27 +30,30 @@ def generate_random_data():
 
 st.title("🔄 Live DDoS Attack Prediction")
 
-# Display model input shape for debugging
-st.write("### **Model Expected Input Shape:**", cnn_model.input_shape)
-
 # Continuous Prediction Button
 if st.button("Start Continuous Prediction"):
     st.write("Generating live network traffic data and predicting...")
 
-    for _ in range(5):  # Prevent infinite loop by limiting predictions
-        # Generate new data
+    for _ in range(5):  # Prevent infinite loop for testing
         input_data = generate_random_data()
-        
-        # If model expects 3D input (1, 7, 1), reshape
-        if len(cnn_model.input_shape) == 3:  
-            input_data = input_data.reshape(1, 7, 1)
 
-        # Make a prediction using the CNN model
+        # **Fixing the input shape issue**
+        model_input_shape = cnn_model.input_shape
+        
+        if len(model_input_shape) == 3:  # If model expects 3D input (e.g., (None, 7, 1))
+            input_data = input_data.reshape(1, 7, 1)
+        elif len(model_input_shape) == 2:  # If model expects 2D input (e.g., (None, 7))
+            input_data = input_data.reshape(1, 7)
+        
+        # **Debugging Output**
+        st.write("### **Processed Input Shape:**", input_data.shape)
+        
+        # Predict using the CNN model
         prediction = cnn_model.predict(input_data)
-        
-        # Interpret prediction (assuming binary classification: 0 = Normal, 1 = DDoS Attack)
+
+        # Interpret prediction (0 = Normal, 1 = DDoS)
         result = "🚀 **DDoS Attack Detected!**" if prediction[0][0] > 0.5 else "✅ **Normal Traffic**"
-        
+
         # Display data and prediction
         st.write("### **Generated Input Data:**")
         st.write(f"Destination Port: {input_data[0][0]}")
@@ -58,6 +64,6 @@ if st.button("Start Continuous Prediction"):
         st.write(f"Flow Packets/s: {input_data[0][5]}")
         st.write(f"Flow IAT Mean: {input_data[0][6]}")
         st.write("### **Prediction:**", result)
-        
+
         # Wait before generating new data
-        time.sleep(2)  # Adjust time interval (in seconds)
+        time.sleep(2)
